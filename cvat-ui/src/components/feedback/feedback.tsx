@@ -102,7 +102,7 @@ export default function Feedback(): JSX.Element {
 
     return (
         <>
-            <Popover
+            {/* <Popover
                 placement='leftTop'
                 title={<Text className='cvat-text-color'>Help to make CVAT better</Text>}
                 content={renderContent()}
@@ -119,7 +119,7 @@ export default function Feedback(): JSX.Element {
                 >
                     {visible ? <CloseCircleOutlined /> : <MessageOutlined />}
                 </Button>
-            </Popover>
+            </Popover> */}
         </>
     );
 }

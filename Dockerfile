@@ -6,6 +6,11 @@ ARG no_proxy="nuclio,${no_proxy}"
 ARG socks_proxy
 ARG DJANGO_CONFIGURATION="production"
 
+# Cloud Storage Args
+ARG AZURE_STORAGE_ACCOUNT
+ARG AZURE_STORAGE_ACCESS_KEY
+ARG MOUNT_POINT
+
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends install -yq \
         apache2-dev \
@@ -149,11 +154,69 @@ COPY --chown=${USER} cvat/ ${HOME}/cvat
 COPY --chown=${USER} utils/ ${HOME}/utils
 COPY --chown=${USER} tests/ ${HOME}/tests
 
+# RUN apt-get update \
+#  && apt-get install -y sudo
+
+RUN apt-get -y install software-properties-common
+# RUN apt-get update
+# RUN adduser ${USER} sudo
+# RUN usermod -aG sudo ${USER}
+
+# Set up the Microsoft package repository
+RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
+RUN apt-add-repository https://packages.microsoft.com/ubuntu/20.04/prod
+RUN apt-get update
+
+# Install blobfuse and fuse:
+RUN apt-get -y install blobfuse fuse
+
+# Create environments (replace account_name, account_key, mount_point):
+# ENV AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT
+# ENV AZURE_STORAGE_ACCESS_KEY=$AZURE_STORAGE_ACCESS_KEY
+ENV MOUNT_POINT=$MOUNT_POINT
+
+# Create a folder for cache
+RUN mkdir -p /mnt/blobfusetmp
+
+# Make sure the file must be owned by the user who mounts the container:
+RUN chown $USER /mnt/blobfusetmp
+
+# Create the mount point, if it doesn’t exists:
+RUN mkdir -p $MOUNT_POINT
+
+# Uncomment user_allow_other in the /etc/fuse.conf file: sudo nano /etc/fuse.conf
+
+
 # RUN all commands below as 'django' user
 USER ${USER}
 WORKDIR ${HOME}
 
 RUN mkdir data share media keys logs /tmp/supervisord
+
+# # Set up the Microsoft package repository
+# RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+# RUN sudo apt-add-repository https://packages.microsoft.com/ubuntu/20.04/prod
+# RUN sudo apt-get update
+
+# # Install blobfuse and fuse:
+# RUN sudo apt-get install blobfuse fuse
+
+# # Create environments (replace account_name, account_key, mount_point):
+# ENV AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT
+# ENV AZURE_STORAGE_ACCESS_KEY=$AZURE_STORAGE_ACCESS_KEY
+# ENV MOUNT_POINT=$MOUNT_POINT
+
+# # Create a folder for cache
+# RUN sudo mkdir -p /mnt/blobfusetmp
+
+# # Make sure the file must be owned by the user who mounts the container:
+# RUN sudo chown $USER /mnt/blobfusetmp
+
+# # Create the mount point, if it doesn’t exists:
+# RUN mkdir -p $MOUNT_POINT
+
+# # Uncomment user_allow_other in the /etc/fuse.conf file: sudo nano /etc/fuse.conf
+
 
 EXPOSE 8080
 ENTRYPOINT ["/usr/bin/supervisord"]

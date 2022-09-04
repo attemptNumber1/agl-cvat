@@ -380,7 +380,10 @@ function HeaderContainer(props: Props): JSX.Element {
     return (
         <Layout.Header className='cvat-header'>
             <div className='cvat-left-header'>
-                <Icon className='cvat-logo-icon' component={CVATLogo} />
+                {/* <Icon className='cvat-logo-icon' component={CVATLogo} /> */}
+                {/* <span style="margin-right:12px;margin-top:5px;margin-left:12px;text-align:center;font-size:14px;"> */}
+                    <h2>ITLogica | Annotator</h2>
+                {/* </span> */}
                 <Button
                     className={getButtonClassName('projects')}
                     type='link'
@@ -460,7 +463,7 @@ function HeaderContainer(props: Props): JSX.Element {
                 ) : null}
             </div>
             <div className='cvat-right-header'>
-                <CVATTooltip overlay='Click to open repository'>
+                {/* <CVATTooltip overlay='Click to open repository'>
                     <Button
                         icon={<GithubOutlined />}
                         size='large'
@@ -474,7 +477,7 @@ function HeaderContainer(props: Props): JSX.Element {
                             window.open(GITHUB_URL, '_blank');
                         }}
                     />
-                </CVATTooltip>
+                </CVATTooltip> */}
                 <CVATTooltip overlay='Click to open guide'>
                     <Button
                         icon={<QuestionCircleOutlined />}
